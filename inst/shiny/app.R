@@ -1,6 +1,6 @@
 library(shiny)
 library(tidyverse)
-library(newbullwhipgame)
+library(bullwhipgame)
 
 ui <- shinyUI(
   navbarPage(
