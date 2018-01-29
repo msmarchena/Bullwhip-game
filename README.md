@@ -18,7 +18,7 @@ The goal of the game is to minimize the total inventory cost in the supply chain
 **Installation:**
 
 To play the bullwhipgame locally you must have installed R, Shiny and the packages used in the server file.<br>
-Copy the "server.R" and "ui.R" files and "www" folder in the same directory on your machine.<br>
+Copy the "app.R" file and "www" folder in the same directory on your machine.<br>
 Open one of the files in RStudio and click the "runApp" button.
 
 From Github, the following command will download and run the application
