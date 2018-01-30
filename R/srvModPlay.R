@@ -18,8 +18,8 @@ srvModPlay <-     function(input, output, session) {
   # reactive expressions
   demand_re <- reactive({
     req(customer_rv(), factory_re())
-    cc <- count(customer_rv())
-    cf <- count(factory_re())
+    cc <- dplyr::count(customer_rv())
+    cf <- dplyr::count(factory_re())
     if(cc == cf){
       tibble(Customer = customer_rv()$Demand,
              Retailer = retailer_re()$Order,
@@ -100,7 +100,7 @@ srvModPlay <-     function(input, output, session) {
         distributor_re(),
         wholesaler_re(),
         retailer_re())
-    if (count(factory_re()) > 14){
+    if (dplyr::count(factory_re()) > 14){
       sum(retailer_re()$Cost[1:15]) +
         sum(wholesaler_re()$Cost[1:15]) +
         sum(distributor_re()$Cost[1:15]) +
@@ -110,7 +110,7 @@ srvModPlay <-     function(input, output, session) {
   
   sc_totalcost_re <- reactive({
     req(sc_partialcost_re())
-    if (count(factory_re()) > 15){
+    if (dplyr::count(factory_re()) > 15){
       sum(retailer_re()$Cost) +
       sum(wholesaler_re()$Cost) +
       sum(distributor_re()$Cost) +

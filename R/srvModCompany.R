@@ -59,7 +59,7 @@ srvModCompany <-     function(input, output, session,
   # events on new demands
   observeEvent(demand_rv(),{
     req(demand_rv(), company_rv(), param_rv())
-    if(count(demand_rv()) > count(company_rv())){
+    if(dplyr::count(demand_rv()) > dplyr::count(company_rv())){
       new <- company_rv() %>% tail(1)
       # Is a customer no company?
       if(length(demand_rv()) < length(company_rv())){
@@ -109,7 +109,7 @@ srvModCompany <-     function(input, output, session,
     company_rv({
       initial_rv() %>%
       bind_rows({
-        company_rv() %>% tail(-count(initial_rv()))
+        dplyr::company_rv() %>% tail(-dplyr::count(initial_rv()))
         })
       })
     }
@@ -118,11 +118,11 @@ srvModCompany <-     function(input, output, session,
   # events on deleted demands => cut values
   observeEvent({
     req(demand_rv(), company_rv())
-    (count(demand_rv()) < count(company_rv()))
+    (dplyr::count(demand_rv()) < dplyr::count(company_rv()))
   },
   {
     company_rv({
-      company_rv() %>% head(count(demand_rv()))
+      company_rv() %>% head(dplyr::count(demand_rv()))
     })
   })
   
