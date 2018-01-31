@@ -4,7 +4,7 @@ library(bullwhipgame)
 
 ui <- shinyUI(
   navbarPage(
-    "newbullwhipgame",
+    "bullwhipgame",
     id = "mainNavbarPage",
     theme = "flatky.css",
     uiModDesc("Description"),
