@@ -32,13 +32,13 @@ srvModPlay <-     function(input, output, session) {
   
   observe({
     customer_rv({
-      newbullwhipgame::initVal %>% select(Demand)
+      bullwhipgame::initVal %>% select(Demand)
     })
   })
   
   observeEvent(input$restart,{ 
     customer_rv({
-      newbullwhipgame::initVal %>% select(Demand)
+      bullwhipgame::initVal %>% select(Demand)
     })
     updateCounter$i <- 0 
   })  

@@ -23,7 +23,7 @@ srvModInitialValues <-     function(input, output, session,
   # events
   # initializing values
   observe({
-    initial_rv(newbullwhipgame::initVal)  
+    initial_rv(bullwhipgame::initVal)  
   })
 
   # changes from calling module
