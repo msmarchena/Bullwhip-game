@@ -108,8 +108,8 @@ srvModCompany <-     function(input, output, session,
     } else { 
     company_rv({
       initial_rv() %>%
-      bind_rows({
-        dplyr::company_rv() %>% tail(-dplyr::count(initial_rv()))
+        bind_rows({
+          company_rv() %>% tail(-dplyr::count(initial_rv()))
         })
       })
     }
