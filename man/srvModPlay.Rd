@@ -4,7 +4,7 @@
 \alias{srvModPlay}
 \title{Server Module Play}
 \usage{
-srvModPlay(input, output, session)
+srvModPlay(input, output, session, initial = NULL)
 }
 \arguments{
 \item{input}{standard \code{shiny} input}

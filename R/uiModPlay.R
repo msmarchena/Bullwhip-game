@@ -17,15 +17,21 @@ uiModPlay <- function(id,
   tabPanel(
     title,
     sidebarPanel(width = 3,
+                 fileInput(
+                   inputId = ns("UploadCustomerDemand"),
+                   label = "Upload Customer demand from CSV file",
+                   accept = c("CSV Customer demand",
+                              "CSV file",
+                              ".csv")),
                  numericInput(inputId = ns("c1"),
-                              "Customer demand", NA),
+                              "Single Customer demand", NA),
                  tags$p(actionButton(inputId = ns("update"), "Update")),
                  tags$p(actionButton(inputId = ns("reset"), "Clear")),
                  tags$p(actionButton(inputId = ns("restart"), "Restart")),
                  textOutput(outputId = ns("count")),
                  br(),
                  htmlOutput(outputId = ns("display"))
-
+                 
     ),
     mainPanel( width = 9,
                br(),

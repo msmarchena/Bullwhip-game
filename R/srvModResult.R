@@ -11,20 +11,25 @@ library(DT)
 #' @export
 #'
 srvModResult <-     function(input, output, session,
-                              values = NULL) {
+                              result = NULL) {
   ns <- session$ns
   # reactives
-  # values
-  values_re <- reactive({
-    if(is.reactive(values)){
-      return(values())
-    } 
-      return(values)
+  result_rv <- reactiveVal()
+
+  # events on parameter values from calling module
+  observe({
+    req(result)
+    if(is.reactive(result)){
+      result_rv(result())
+    } else{
+      result_rv(result)
+    }
   })
-  
+
   # outputs
-  output$Results<- DT::renderDataTable(values_re(),
-                                       # colnames = c('Time' = 1),
-                                       options = list(lengthMenu = c(5, 25, 50), pageLength = 25)
-  )
+  output$Results <- DT::renderDataTable({
+    DT::datatable(result_rv(),
+                  options = list(lengthMenu = c(5, 25, 50), 
+                                 pageLength = 25))
+  })
 }

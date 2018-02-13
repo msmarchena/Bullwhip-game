@@ -9,12 +9,26 @@ library(DT)
 #' @return customer_rv
 #' @export
 #'
-srvModPlay <-     function(input, output, session) {
+srvModPlay <-     function(input, output, session,
+                           initial = NULL) {
   ns <- session$ns
   # reactive values
   inputs_rv <- reactiveVal()
+  initial_rv <- reactiveVal()
   customer_rv <- reactiveVal()
-              
+  
+  # events on initial values
+  observe({
+    req(initial)
+    if(is.reactive(initial)){
+      initial_rv(initial())
+    } else{
+      initial_rv(initial)
+    }
+    customer_rv(initial_rv() %>% select(Demand))
+    updateCounter$i <- 0 
+  })
+  
   # reactive expressions
   demand_re <- reactive({
     req(customer_rv(), factory_re())
@@ -30,16 +44,9 @@ srvModPlay <-     function(input, output, session) {
     }
   })
   
-  observe({
-    customer_rv({
-      bullwhipgame::initVal %>% select(Demand)
-    })
-  })
-  
+  # event on restart button
   observeEvent(input$restart,{ 
-    customer_rv({
-      bullwhipgame::initVal %>% select(Demand)
-    })
+    customer_rv(initial_rv() %>% select(Demand))
     updateCounter$i <- 0 
   })  
   
@@ -65,22 +72,22 @@ srvModPlay <-     function(input, output, session) {
   # modules
   retailer_re <- callModule(module = srvModCompany,
                             id = "Retailer",
-                            inputs = inputs_rv,
+                            initial = initial_rv,
                             demand = customer_rv,
                             supply = wholesaler_re)
   wholesaler_re <- callModule(module = srvModCompany,
                            id = "Wholesaler",
-                           inputs = inputs_rv,
+                           initial = initial_rv,
                            demand = retailer_re,
                            supply = distributor_re)
   distributor_re <- callModule(module = srvModCompany,
                            id = "Distributor",
-                           inputs = inputs_rv,
+                           initial = initial_rv,
                            demand = wholesaler_re,
                            supply = factory_re)
   factory_re <- callModule(module = srvModCompany,
                            id = "Factory",
-                           inputs = inputs_rv,
+                           initial = initial_rv,
                            demand = distributor_re)
   callModule(module = srvModOrders,
              id = "Orders",
@@ -90,6 +97,17 @@ srvModPlay <-     function(input, output, session) {
              orders = demand_re)
   callModule(module = srvModGlossary,
              id = "Glossary")
+  
+  # inputs
+  observeEvent(input$UploadCustomerDemand, {
+    req(input$UploadCustomerDemand, input$UploadCustomerDemand$datapath)
+    file_all <- isolate(input$UploadCustomerDemand)
+    customer <- customer_rv()
+    new_rows <- read.csv2(file = file_all$datapath) %>% select(Demand)
+    updateCounter$i <- updateCounter$i + dplyr::count(new_rows)
+    customer <- customer %>% bind_rows(new_rows)
+    customer_rv(customer)
+  })
   
   # outputs
   ##################################################################################################################

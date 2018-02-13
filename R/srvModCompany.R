@@ -13,7 +13,7 @@ library(tidyverse)
 #' @export
 #'
 srvModCompany <-     function(input, output, session,
-                                     inputs = NULL,
+                                     initial = NULL,
                                      demand = NULL,
                                      supply = NULL) {
   ns <- session$ns
@@ -24,17 +24,22 @@ srvModCompany <-     function(input, output, session,
   initial_rv <- reactiveVal()
   param_rv <- reactiveVal()
   
-  # events on initial values from calling module
+  # events on initial values
   observe({
-    req(inputs(), inputs()$initial)
-    initial_rv(inputs()$initial)
+    req(initial)
+    if(is.reactive(initial)){
+      initial_rv(initial())
+    } else{
+      initial_rv(initial)
+    }
   })
-
-  # events on parameter values from calling module
-  observe({
-    req(inputs(), inputs()$param)
-    param_rv(inputs()$param)
-  })
+  
+  
+  # # events on parameter values from calling module
+  # observe({
+  #   req(inputs(), inputs()$param)
+  #   param_rv(inputs()$param)
+  # })
   
   # events on supply
   observe({
@@ -59,13 +64,13 @@ srvModCompany <-     function(input, output, session,
   # events on new demands
   observeEvent(demand_rv(),{
     req(demand_rv(), company_rv(), param_rv())
-    if(dplyr::count(demand_rv()) > dplyr::count(company_rv())){
+    while(dplyr::count(demand_rv()) > dplyr::count(company_rv())){
       new <- company_rv() %>% tail(1)
-      # Is a customer no company?
+      # Is it a customer no company?
       if(length(demand_rv()) < length(company_rv())){
-        new$Demand <- demand_rv()$Demand %>% tail(1)
+        new$Demand <- demand_rv()$Demand %>% head(dplyr::count(company_rv()) + 1) %>% tail(1)
       } else{
-        new$Demand <- demand_rv()$Order %>% head(-1) %>% tail(1)
+        new$Demand <- demand_rv()$Order %>% head(-dplyr::count(company_rv()) + 1) %>% tail(1)
       }
       new$Receive <- mylag(company_rv()$Order, param_rv()$lt)
       new$NS <- tail(company_rv()$NS, 1) + new$Receive - new$Demand  
@@ -87,7 +92,7 @@ srvModCompany <-     function(input, output, session,
         else{  abs(new$NS * param_rv()$backlogcost) }
       }
       
-      ##simulated bullwhip measure
+      # simulated bullwhip measure
       var_demand <- var(company_rv()$Demand)
       var_order <- var(company_rv()$Order)
       new$Bullwhip <-   var_order/var_demand
@@ -98,15 +103,16 @@ srvModCompany <-     function(input, output, session,
       #store the result
       res <- company_rv() %>% bind_rows(new)
       company_rv(res)
-    }
+    }#endwhile
   })
   
   # events on initial values
   observeEvent(initial_rv(),{
-    if(!isTruthy(company_rv())){
+    if(!isTruthy(company_rv()) ||
+       dplyr::count(initial_rv()) > dplyr::count(company_rv())){
       company_rv(initial_rv())
-    } else { 
-    company_rv({
+    } else {
+      company_rv({
       initial_rv() %>%
         bind_rows({
           company_rv() %>% tail(-dplyr::count(initial_rv()))
@@ -129,12 +135,9 @@ srvModCompany <-     function(input, output, session,
   # modules
   callModule(module = srvModResult,
              id = "Result",
-             values = company_rv)
+             result = company_rv)
   param_rv <- callModule(module = srvModParam,
                            id = "Param")
-  initial_rv <- callModule(module = srvModInitialValues,
-                           id = "Initial",
-                           initial = initial_rv)
   
   # outputs
   return(company_rv)

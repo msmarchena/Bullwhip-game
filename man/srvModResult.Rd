@@ -4,7 +4,7 @@
 \alias{srvModResult}
 \title{Server Module for Results}
 \usage{
-srvModResult(input, output, session, values = NULL)
+srvModResult(input, output, session, result = NULL)
 }
 \arguments{
 \item{input}{standard \code{shiny} input}

@@ -4,7 +4,7 @@
 \alias{srvModCompany}
 \title{Server Module for a Company}
 \usage{
-srvModCompany(input, output, session, inputs = NULL, demand = NULL,
+srvModCompany(input, output, session, initial = NULL, demand = NULL,
   supply = NULL)
 }
 \arguments{
@@ -14,11 +14,11 @@ srvModCompany(input, output, session, inputs = NULL, demand = NULL,
 
 \item{session}{standard \code{shiny} session}
 
+\item{initial}{initial values}
+
 \item{demand}{demand company}
 
 \item{supply}{supply company}
-
-\item{initial}{initial values}
 }
 \value{
 company_rv
