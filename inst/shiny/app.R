@@ -8,6 +8,7 @@ ui <- shinyUI(
     id = "mainNavbarPage",
     theme = "flatky.css",
     uiModDesc("Description"),
+    uiModInitialValuesCSV("Initial", title = "Initial Values"),
     uiModPlay("Play"),
     uiModGlossary("Glossary"),
     uiModAbout("About")
@@ -17,10 +18,18 @@ server <- shinyServer(function(input, output, session) {
   ns <- session$ns
 
   # reactive values
-  inputs_rv <- reactiveVal()
+  initial_rv <- reactiveVal()
+
+  observe({
+    initial_rv(bullwhipgame::initVal %>% select(Demand))
+  })
   
+  initial_rv <- callModule(module = srvModInitialValuesCSV,
+                           id = "Initial",
+                           initial = initial_rv)
   callModule(module = srvModPlay,
-                           id = "Play")
+                           id = "Play",
+             initial = initial_rv)
   callModule(module = srvModGlossary,
              id = "Glossary")
 })
