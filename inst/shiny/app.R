@@ -6,7 +6,7 @@ ui <- shinyUI(
   navbarPage(
     "bullwhipgame",
     id = "mainNavbarPage",
-    theme = "flatky.css",
+    theme = "flatly.css",
     uiModDesc("Description"),
     uiModInitialValuesCSV("Initial", title = "Initial Values"),
     uiModPlay("Play"),
